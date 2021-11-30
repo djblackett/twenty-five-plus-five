@@ -88,7 +88,7 @@ export default function Clock() {
       minutes = "0" + minutes;
     }
 
-    if (seconds.length == 1) {
+    if (seconds.length === 1) {
       seconds = "0" + seconds;
     }
 
