@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import ReactDOM from "react-dom";
 import "./App.css";
 import { BreakLabel } from "./BreakLabel";
 import { Session } from "./Session";
@@ -85,7 +84,7 @@ export default function Clock() {
   };
 
   const formatTimeLeft = (minutes, seconds) => {
-    if (minutes.length == 1) {
+    if (minutes.length === 1) {
       minutes = "0" + minutes;
     }
 
@@ -203,5 +202,3 @@ export default function Clock() {
     </div>
   );
 }
-
-ReactDOM.render(<Clock />, document.getElementById("root"));
