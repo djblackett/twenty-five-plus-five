@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
+import "./App.css";
+import { BreakLabel } from "./BreakLabel";
+import { Session } from "./Session";
+import { SessionLabel } from "./SessionLabel";
+import { TimerControls } from "./TimerControls";
 
-
-export function Clock() {
+export default function Clock() {
   const [state, setState] = useState({
     breakLength: 5,
     sessionLength: 25,
@@ -94,6 +98,27 @@ export function Clock() {
     return timeLeftString;
   };
 
+  const setTimer = useCallback((minutes, seconds) => {
+    let timerId = setInterval(() => {
+      if (seconds > 0) {
+        seconds--;
+      } else if (minutes > 0) {
+        minutes--;
+        seconds = 59;
+      }
+
+      let newTime = formatTimeLeft(minutes.toString(), seconds.toString());
+
+      setState((prev) => {
+        return { ...prev, timeLeft: newTime };
+      });
+    }, 1000);
+
+    setState((prev) => {
+      return { ...prev, timerId: timerId, isTimerActive: true };
+    });
+  }, []);
+
   useEffect(() => {
     if (state.timeLeft === "00:00" && state.timerLabel === "Session") {
       clearInterval(state.timerId);
@@ -122,28 +147,14 @@ export function Clock() {
       document.getElementById("beep").play();
       setTimer(state.sessionLength, 0);
     }
-  });
-
-  const setTimer = (minutes, seconds) => {
-    let timerId = setInterval(() => {
-      if (seconds > 0) {
-        seconds--;
-      } else if (minutes > 0) {
-        minutes--;
-        seconds = 59;
-      }
-
-      let newTime = formatTimeLeft(minutes.toString(), seconds.toString());
-
-      setState((prev) => {
-        return { ...prev, timeLeft: newTime };
-      });
-    }, 1000);
-
-    setState((prev) => {
-      return { ...prev, timerId: timerId, isTimerActive: true };
-    });
-  };
+  }, [
+    state.timeLeft,
+    state.timerLabel,
+    state.timerId,
+    state.breakLength,
+    state.sessionLength,
+    setTimer,
+  ]);
 
   const startCountDown = () => {
     let time = state.timeLeft;
@@ -189,82 +200,6 @@ export function Clock() {
         src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
         preload="auto"
       ></audio>
-    </div>
-  );
-}
-
-function BreakLabel(props) {
-  return (
-    <div id="break-wrapper">
-      <div id="break-label">Break Length</div>
-
-      <div className="length-buttons">
-        <button
-          className="up-down-buttons"
-          id="break-decrement"
-          onClick={props.decrement}
-        >
-          <i class="fas fa-arrow-down"></i>
-        </button>
-        <p id="break-length">{props.length}</p>
-        <button
-          className="up-down-buttons"
-          id="break-increment"
-          onClick={props.increment}
-        >
-          <i class="fas fa-arrow-up"></i>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function SessionLabel(props) {
-  return (
-    <div id="session-wrapper">
-      <div id="session-label">Session Length</div>
-
-      <div className="length-buttons">
-        <button
-          className="up-down-buttons"
-          id="session-decrement"
-          onClick={props.decrement}
-        >
-          <i class="fas fa-arrow-down"></i>
-        </button>
-        <p id="session-length">{props.length}</p>
-        <button
-          className="up-down-buttons"
-          id="session-increment"
-          onClick={props.increment}
-        >
-          <i class="fas fa-arrow-up"></i>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Session(props) {
-  return (
-    <div id="timer-flex-container">
-      <p id="timer-label">{props.timerLabel}</p>
-      <p id="time-left" onChange={props.handleChange}>
-        {props.timeLeft}
-      </p>
-    </div>
-  );
-}
-
-function TimerControls(props) {
-  return (
-    <div id="controls">
-      <button id="start_stop" onClick={props.startClick}>
-        Start/Stop
-      </button>
-      <button id="reset" onClick={props.resetClick}>
-        Reset
-      </button>
     </div>
   );
 }
